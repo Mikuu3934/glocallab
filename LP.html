@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLOCALLAB - グローバルな世界へ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* カスタムカラースタイル */
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #FCF8DD; /* メインの背景色 */
+            color: #333;
+        }
+        .bg-custom-teal { background-color: #00809D; }
+        .text-custom-teal { color: #00809D; }
+        .bg-custom-ivory { background-color: #FCF8DD; }
+        .text-custom-ivory { color: #FCF8DD; }
+        .bg-custom-gold { background-color: #FFD700; }
+        .text-custom-gold { color: #FFD700; }
+        .bg-custom-dark-gold { background-color: #D3AF37; }
+        .text-custom-dark-gold { color: #D3AF37; }
+        .border-custom-gold { border-color: #FFD700; }
+
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://placehold.co/1600x900/00809D/FCF8DD?text=GLOBAL+LOCAL');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="bg-custom-ivory">
+
+    <!-- ヘッダー -->
+    <header class="bg-custom-teal text-custom-ivory p-4 fixed w-full top-0 z-50 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-wider">GLOBAL LAB</h1>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#about" class="hover:text-custom-gold transition duration-300">私たちについて</a>
+                <a href="#projects" class="hover:text-custom-gold transition duration-300">プロジェクト</a>
+                <a href="#news" class="hover:text-custom-gold transition duration-300">ニュース</a>
+                <a href="#contact" class="bg-custom-gold text-custom-teal font-bold py-2 px-4 rounded-full hover:bg-custom-dark-gold transition duration-300">参加する</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+        <!-- モバイルメニュー -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4">
+            <a href="#about" class="block py-2 px-4 hover:bg-custom-dark-gold rounded">私たちについて</a>
+            <a href="#projects" class="block py-2 px-4 hover:bg-custom-dark-gold rounded">プロジェクト</a>
+            <a href="#news" class="block py-2 px-4 hover:bg-custom-dark-gold rounded">ニュース</a>
+            <a href="#contact" class="block py-2 px-4 mt-2 bg-custom-gold text-custom-teal text-center font-bold rounded-full hover:bg-custom-dark-gold">参加する</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- ヒーローセクション -->
+        <section class="hero-section h-screen flex items-center justify-center text-center text-white pt-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl md:text-6xl font-bold mb-4 leading-tight shadow-text">グローバルな社会へトビたとう。</h2>
+                <p class="text-lg md:text-xl max-w-2xl mx-auto">私たちは、グローバルな経験を、育成し、行動するクリエイティブな集団です。</p>
+            </div>
+        </section>
+
+        <!-- 私たちについて -->
+        <section id="about" class="py-20 bg-custom-ivory">
+            <div class="container mx-auto px-6 text-center">
+                <h3 class="text-3xl font-bold text-custom-teal mb-6">WHAT WE DO</h3>
+                <p class="max-w-3xl mx-auto text-gray-700 leading-relaxed">
+                    ここにテキストを入れる
+                </p>
+            </div>
+        </section>
+
+        <!-- プロジェクトセクション -->
+        <section id="projects" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h3 class="text-3xl font-bold text-center text-custom-teal mb-12">OUR PROJECTS</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- プロジェクトカード 1 -->
+                    <div class="bg-custom-ivory rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                        <img src="https://placehold.co/600x400/00809D/FCF8DD?text=Project+1" alt="プロジェクト1の画像" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h4 class="text-xl font-bold text-custom-teal mb-2">SDGsビジュアライゼーション</h4>
+                            <p class="text-gray-600">持続可能な開発目標（SDGs）を、誰もが直感的に理解できるインフォグラフィックや映像で伝えます。</p>
+                        </div>
+                    </div>
+                    <!-- プロジェクトカード 2 -->
+                    <div class="bg-custom-ivory rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                        <img src="https://placehold.co/600x400/D3AF37/FCF8DD?text=Project+2" alt="プロジェクト2の画像" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h4 class="text-xl font-bold text-custom-teal mb-2">アース・クロック</h4>
+                            <p class="text-gray-600">地球の様々なデータをリアルタイムで表示し、地球の「今」を感じることができるデジタル時計を開発。</p>
+                        </div>
+                    </div>
+                    <!-- プロジェクトカード 3 -->
+                    <div class="bg-custom-ivory rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                        <img src="https://placehold.co/600x400/FFD700/333333?text=Project+3" alt="プロジェクト3の画像" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h4 class="text-xl font-bold text-custom-teal mb-2">リサイクル・アート展</h4>
+                            <p class="text-gray-600">廃棄物に新たな命を吹き込むアート作品を展示。資源循環の大切さを伝えます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ニュースセクション -->
+        <section id="news" class="py-20 bg-custom-ivory">
+            <div class="container mx-auto px-6">
+                <h3 class="text-3xl font-bold text-center text-custom-teal mb-12">LATEST NEWS</h3>
+                <div class="max-w-3xl mx-auto">
+                    <div class="border-b-2 border-custom-dark-gold py-4">
+                        <p class="text-gray-500">2025.09.15</p>
+                        <a href="#" class="text-lg text-custom-teal hover:text-custom-dark-gold transition">新しいパートナーシップに関するお知らせ</a>
+                    </div>
+                    <div class="border-b-2 border-custom-dark-gold py-4">
+                        <p class="text-gray-500">2025.08.28</p>
+                        <a href="#" class="text-lg text-custom-teal hover:text-custom-dark-gold transition">「アース・クロック」アプリ版がリリースされました。</a>
+                    </div>
+                    <div class="border-b-2 border-custom-dark-gold py-4">
+                        <p class="text-gray-500">2025.07.10</p>
+                        <a href="#" class="text-lg text-custom-teal hover:text-custom-dark-gold transition">夏休み特別企画「こども環境ワークショップ」を開催しました。</a>
+                    </div>
+                </div>
+                <div class="text-center mt-12">
+                    <a href="#" class="bg-custom-teal text-white font-bold py-3 px-8 rounded-full hover:bg-opacity-80 transition duration-300">もっと見る</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 参加するセクション -->
+        <section id="contact" class="py-20 bg-custom-dark-gold text-custom-ivory">
+             <div class="container mx-auto px-6 text-center">
+                <h3 class="text-3xl font-bold mb-6">JOIN US</h3>
+                <p class="max-w-2xl mx-auto mb-8">
+                    ここにテキストを入れる
+                </p>
+                <a href="#" class="bg-custom-ivory text-custom-dark-gold font-bold py-3 px-8 rounded-full hover:bg-custom-gold hover:text-custom-teal transition duration-300">詳しくはこちら</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-custom-teal text-custom-ivory py-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 GLOBALLAB. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // モバイルメニューのトグル
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+
+</body>
+</html>
