@@ -64,8 +64,12 @@
             <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">管理者ログイン</h2>
             <form id="login-form">
                 <div class="mb-4">
-                    <label class="form-label" for="password">パスワード</label>
-                    <input class="form-input" id="password" type="password" placeholder="********" required>
+                    <label class="form-label" for="login-email">メールアドレス</label>
+                    <input class="form-input" id="login-email" type="email" placeholder="admin@example.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="login-password">パスワード</label>
+                    <input class="form-input" id="login-password" type="password" placeholder="********" required>
                 </div>
                 <p id="login-error" class="text-red-500 text-sm mb-4 h-5"></p>
                 <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">ログイン</button>
@@ -80,6 +84,7 @@
     <script type="module">
         // Firebaseライブラリをインポート
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- あなたのFirebaseプロジェクト設定 ---
@@ -95,16 +100,14 @@
 
         // Firebaseを初期化
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
         const postsCollection = collection(db, "blogPosts");
-
-        // --- 設定 ---
-        const ADMIN_PASSWORD = 'admin'; // 管理者パスワード
-
+        
         // --- JavaScriptの処理 ---
         document.addEventListener('DOMContentLoaded', () => {
             let isLoggedIn = false;
-            let localPostsCache = []; // 記事データをローカルにキャッシュ
+            let localPostsCache = [];
 
             const postsContainer = document.getElementById('posts-container');
             const modal = document.getElementById('post-modal');
@@ -117,7 +120,8 @@
 
             const loginModal = document.getElementById('login-modal');
             const loginForm = document.getElementById('login-form');
-            const passwordInput = document.getElementById('password');
+            const emailInput = document.getElementById('login-email');
+            const passwordInput = document.getElementById('login-password');
             const loginError = document.getElementById('login-error');
             const closeLoginModalBtn = document.getElementById('close-login-modal-btn');
 
@@ -132,11 +136,12 @@
                     adminElements.forEach(el => el.style.display = 'none');
                     loggedOutElements.forEach(el => el.style.display = 'inline-block');
                 }
-                displayPosts(localPostsCache); // ログイン状態が変わったらボタン表示を更新
+                displayPosts(localPostsCache);
             }
 
             function showLoginModal() {
                 loginError.textContent = '';
+                emailInput.value = '';
                 passwordInput.value = '';
                 loginModal.classList.remove('hidden');
                 loginModal.classList.add('flex');
@@ -148,23 +153,29 @@
             }
 
             // --- ログイン・ログアウト処理 ---
-            function handleLogin(event) {
+            async function handleLogin(event) {
                 event.preventDefault();
-                if (passwordInput.value === ADMIN_PASSWORD) {
-                    isLoggedIn = true;
-                    sessionStorage.setItem('isLoggedIn', 'true');
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                loginError.textContent = '';
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // ログイン成功時の処理は onAuthStateChanged が行う
                     hideLoginModal();
-                    updateAdminUI();
-                } else {
-                    loginError.textContent = 'パスワードが違います。';
-                    passwordInput.value = '';
+                } catch (error) {
+                    console.error("Login failed:", error);
+                    loginError.textContent = 'メールアドレスまたはパスワードが違います。';
                 }
             }
 
-            function handleLogout() {
-                isLoggedIn = false;
-                sessionStorage.removeItem('isLoggedIn');
-                updateAdminUI();
+            async function handleLogout() {
+                try {
+                    await signOut(auth);
+                    // ログアウト成功時の処理は onAuthStateChanged が行う
+                } catch (error) {
+                    console.error("Logout failed:", error);
+                }
             }
 
             // --- 記事一覧表示 ---
@@ -193,9 +204,9 @@
                 });
             }
 
-            // --- モーダル関連 ---
+            // --- モーダル関連 (変更なし) ---
             window.openModal = async (postId, mode = 'read') => {
-                if (mode === 'edit' && !isLoggedIn) return;
+                if (mode !== 'read' && !isLoggedIn) return;
                 
                 const post = localPostsCache.find(p => p.id === postId);
                 if (!post && mode !== 'new') return;
@@ -214,7 +225,7 @@
             }
             
             function renderReadView(post) {
-                const adminButtons = isLoggedIn ? `
+                 const adminButtons = isLoggedIn ? `
                     <div class="flex justify-end gap-2">
                         <button onclick="openModal('${post.id}', 'edit')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">編集</button>
                         <button onclick="deletePost('${post.id}')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">削除</button>
@@ -263,34 +274,20 @@
                 }, 300);
             }
 
-            // --- Firestoreデータ操作 ---
+            // --- Firestoreデータ操作 (変更なし) ---
             async function savePost(event) {
                 event.preventDefault();
                 if (!isLoggedIn) return;
                 const form = event.target;
                 const postId = form.dataset.postId;
-                
-                const postData = {
-                    title: form.querySelector('#title').value,
-                    author: form.querySelector('#author').value,
-                    date: form.querySelector('#date').value,
-                    snippet: form.querySelector('#snippet').value,
-                    content: form.querySelector('#content').value,
-                    createdAt: postId ? (localPostsCache.find(p => p.id === postId).createdAt || new Date()) : new Date()
-                };
-
-                if (postId) { // 更新
-                    const postDoc = doc(db, "blogPosts", postId);
-                    await setDoc(postDoc, postData, { merge: true });
-                } else { // 新規作成
-                    await addDoc(postsCollection, postData);
-                }
+                const postData = { title: form.querySelector('#title').value, author: form.querySelector('#author').value, date: form.querySelector('#date').value, snippet: form.querySelector('#snippet').value, content: form.querySelector('#content').value, createdAt: postId ? (localPostsCache.find(p => p.id === postId).createdAt || new Date()) : new Date() };
+                if (postId) { await setDoc(doc(db, "blogPosts", postId), postData, { merge: true }); } else { await addDoc(postsCollection, postData); }
                 closeModal();
             }
 
             window.deletePost = async (postId) => {
                 if (!isLoggedIn) return;
-                if (confirm('本当にこの記事を削除しますか？この操作は元に戻せません。')) {
+                if (confirm('本当にこの記事を削除しますか？')) {
                     await deleteDoc(doc(db, "blogPosts", postId));
                     if (!modal.classList.contains('hidden')) { closeModal(); }
                 }
@@ -307,13 +304,17 @@
                 modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
                 document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
 
-                // ログイン状態の確認（ページ読み込み時にモーダルは表示しない）
-                if (sessionStorage.getItem('isLoggedIn') === 'true') {
-                    isLoggedIn = true;
-                } else {
-                    isLoggedIn = false;
-                }
-                updateAdminUI();
+                // ★ ログイン状態を監視するリスナー ★
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // ユーザーがログインしている場合
+                        isLoggedIn = true;
+                    } else {
+                        // ユーザーがログアウトしている場合
+                        isLoggedIn = false;
+                    }
+                    updateAdminUI(); // UIを更新
+                });
 
                 // Firestoreのリアルタイムリスナーを設定
                 const q = query(postsCollection, orderBy("createdAt", "desc"));
