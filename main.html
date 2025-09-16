@@ -28,7 +28,6 @@
                 <p class="text-gray-600 mt-1">最新の活動報告やお知らせを更新しています。</p>
             </div>
             <div id="admin-menu" class="flex items-center gap-4">
-                <button id="login-btn" class="logged-out-only bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">管理者ログイン</button>
                 <button id="new-post-btn" class="admin-only bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">新規投稿</button>
                 <button id="logout-btn" class="admin-only bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">ログアウト</button>
             </div>
@@ -46,6 +45,9 @@
     <footer class="bg-white mt-12 py-6">
         <div class="container mx-auto px-6 text-center text-gray-500">
             <p>&copy; 2025 [あなたの団体名]. All Rights Reserved.</p>
+            <div class="mt-4">
+                 <button id="login-btn" class="logged-out-only text-gray-500 hover:text-gray-700 hover:underline text-sm transition-colors">管理者ログイン</button>
+            </div>
         </div>
     </footer>
 
@@ -78,7 +80,7 @@
     <script type="module">
         // Firebaseライブラリをインポート
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, getDoc, setDoc, deleteDoc, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- あなたのFirebaseプロジェクト設定 ---
         const firebaseConfig = {
@@ -274,7 +276,7 @@
                     date: form.querySelector('#date').value,
                     snippet: form.querySelector('#snippet').value,
                     content: form.querySelector('#content').value,
-                    createdAt: postId ? (localPostsCache.find(p => p.id === postId).createdAt || new Date()) : new Date() // 編集時は既存の時間を維持
+                    createdAt: postId ? (localPostsCache.find(p => p.id === postId).createdAt || new Date()) : new Date()
                 };
 
                 if (postId) { // 更新
@@ -305,12 +307,11 @@
                 modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
                 document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
 
-                // ログイン状態の確認
+                // ログイン状態の確認（ページ読み込み時にモーダルは表示しない）
                 if (sessionStorage.getItem('isLoggedIn') === 'true') {
                     isLoggedIn = true;
                 } else {
                     isLoggedIn = false;
-                    showLoginModal();
                 }
                 updateAdminUI();
 
@@ -331,3 +332,4 @@
     </script>
 </body>
 </html>
+
