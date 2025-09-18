@@ -166,6 +166,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // ★ Firebase Storageのライブラリを追加
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         // --- あなたのFirebaseプロジェクト設定 ---
         const firebaseConfig = {
@@ -182,8 +184,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app); // ★ Storageを初期化
         
-        // --- ★ 2つのコレクションを定義 ---
         const projectsCollection = collection(db, "projects");
         const newsCollection = collection(db, "news");
         
@@ -221,7 +223,6 @@
                     adminElements.forEach(el => el.style.display = 'none');
                     loggedOutElements.forEach(el => el.style.display = 'inline-block');
                 }
-                // 再描画して管理ボタンの表示/非表示を更新
                 displayProjects(localProjectsCache);
                 displayNews(localNewsCache);
             }
@@ -295,17 +296,13 @@
                 newsContainer.innerHTML = '';
                  posts.forEach(post => {
                     const postElement = document.createElement('div');
-                    // デザインをリスト形式に変更し、flexboxで要素を配置
                     postElement.className = 'border-b-2 border-custom-dark-gold py-4 flex justify-between items-center';
-
-                    // ログインしている管理者向けのボタン
                     const adminButtons = isLoggedIn ? `
                         <div class="flex-shrink-0 ml-4 flex gap-2">
                             <button onclick="openModal('${post.id}', 'news', 'edit')" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded-lg">編集</button>
                             <button onclick="deletePost('${post.id}', 'news')" class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-1 px-2 rounded-lg">削除</button>
                         </div>
                     ` : '';
-
                     postElement.innerHTML = `
                         <div>
                             <p class="text-gray-500">${post.date}</p>
@@ -317,21 +314,17 @@
                 });
             }
 
-
             // --- モーダル関連 ---
             window.openModal = (postId, type, mode = 'read') => {
                 if (mode !== 'read' && !isLoggedIn) return;
-                
                 const cache = type === 'projects' ? localProjectsCache : localNewsCache;
                 const post = cache.find(p => p.id === postId);
                 if (!post && mode !== 'new') return;
-
                 if (mode === 'read') {
                     renderReadView(post, type);
                 } else {
                     renderEditView(post, type);
                 }
-
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 document.body.classList.add('modal-open');
@@ -355,13 +348,14 @@
                 `;
             }
 
+            // ★ 画像アップロードUIを持つように編集フォームを更新
             function renderEditView(post = null, type = 'projects') {
                 if (!isLoggedIn) return;
                 const isNew = post === null;
                 const postId = isNew ? '' : post.id;
                 modalBody.innerHTML = `
                     <h2 class="text-3xl font-bold text-gray-900 mb-6">${isNew ? '新規投稿の作成' : '投稿の編集'}</h2>
-                    <form id="post-form" data-post-id="${postId}">
+                    <form id="post-form" data-post-id="${postId}" data-existing-image-url="${isNew ? '' : post.imageUrl || ''}">
                         <div class="mb-4">
                             <label class="form-label" for="category">カテゴリー</label>
                             <select id="category" class="form-input" required>
@@ -371,7 +365,16 @@
                         </div>
                         <div class="mb-4"><label class="form-label" for="title">タイトル</label><input class="form-input" id="title" type="text" value="${isNew ? '' : post.title}" required></div>
                         <div class="mb-4"><label class="form-label" for="date">日付</label><input class="form-input" id="date" type="text" value="${isNew ? new Date().toLocaleDateString('ja-JP').replaceAll('/', '-') : post.date}" required></div>
-                        <div class="mb-4"><label class="form-label" for="imageUrl">画像URL</label><input class="form-input" id="imageUrl" type="text" value="${isNew ? '' : post.imageUrl || ''}" placeholder="https://example.com/image.jpg"></div>
+                        
+                        <!-- 画像アップロードフィールド -->
+                        <div class="mb-4">
+                            <label class="form-label" for="imageUpload">画像</label>
+                            <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" id="imageUpload" type="file" accept="image/*">
+                            <p class="mt-1 text-sm text-gray-500">PNG, JPG, GIF (MAX. 5MB). 新しい画像をアップロードすると現在の画像が置き換わります。</p>
+                            <img id="image-preview" src="${isNew || !post.imageUrl ? '' : post.imageUrl}" alt="Image Preview" class="mt-2 rounded-lg ${isNew || !post.imageUrl ? 'hidden' : ''}" style="max-height: 200px;"/>
+                            <div id="upload-status" class="hidden mt-2 text-sm font-semibold"></div>
+                        </div>
+
                         <div class="mb-4"><label class="form-label" for="snippet">概要（一覧に表示）</label><textarea class="form-input" id="snippet" rows="3" required>${isNew ? '' : post.snippet}</textarea></div>
                         <div class="mb-6"><label class="form-label" for="content">本文</label><textarea class="form-input" id="content" rows="10" required>${isNew ? '' : post.content}</textarea></div>
                         <div class="flex justify-end gap-4">
@@ -381,6 +384,19 @@
                     </form>
                 `;
                 document.getElementById('post-form').addEventListener('submit', savePost);
+                // 画像プレビュー用のイベントリスナー
+                document.getElementById('imageUpload').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const preview = document.getElementById('image-preview');
+                            preview.src = event.target.result;
+                            preview.classList.remove('hidden');
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
             }
 
             window.closeModal = () => {
@@ -394,11 +410,37 @@
                 }, 300);
             }
 
-            // --- Firestoreデータ操作 ---
+            // --- Firestoreデータ操作 (★ 画像アップロード処理を追加) ---
             async function savePost(event) {
                 event.preventDefault();
                 if (!isLoggedIn) return;
+                
                 const form = event.target;
+                const submitButton = form.querySelector('button[type="submit"]');
+                const uploadStatus = form.querySelector('#upload-status');
+                submitButton.disabled = true;
+                
+                let finalImageUrl = form.dataset.existingImageUrl;
+                const imageFile = form.querySelector('#imageUpload').files[0];
+
+                // もし新しい画像ファイルが選択されていたら、Storageにアップロード
+                if (imageFile) {
+                    uploadStatus.textContent = '画像をアップロード中...';
+                    uploadStatus.classList.remove('hidden');
+                    const storageRef = ref(storage, `images/${Date.now()}-${imageFile.name}`);
+                    try {
+                        const snapshot = await uploadBytes(storageRef, imageFile);
+                        finalImageUrl = await getDownloadURL(snapshot.ref);
+                        uploadStatus.textContent = 'アップロード完了！';
+                    } catch (error) {
+                        console.error("Image upload failed:", error);
+                        uploadStatus.textContent = 'アップロードに失敗しました。';
+                        uploadStatus.style.color = 'red';
+                        submitButton.disabled = false;
+                        return; // エラー時は処理を中断
+                    }
+                }
+
                 const postId = form.dataset.postId;
                 const category = form.querySelector('#category').value;
                 const collectionRef = category === 'projects' ? projectsCollection : newsCollection;
@@ -408,30 +450,35 @@
                     date: form.querySelector('#date').value,
                     snippet: form.querySelector('#snippet').value,
                     content: form.querySelector('#content').value,
-                    imageUrl: form.querySelector('#imageUrl').value,
+                    imageUrl: finalImageUrl, // 更新されたURLを使用
                     updatedAt: serverTimestamp()
                 };
                 
-                if (postId) {
-                    await setDoc(doc(db, category, postId), postData, { merge: true });
-                } else {
-                    postData.createdAt = serverTimestamp();
-                    await addDoc(collectionRef, postData);
+                try {
+                    if (postId) {
+                        await setDoc(doc(db, category, postId), postData, { merge: true });
+                    } else {
+                        postData.createdAt = serverTimestamp();
+                        await addDoc(collectionRef, postData);
+                    }
+                    closeModal();
+                } catch (error) {
+                    console.error("Failed to save post:", error);
+                    uploadStatus.textContent = "投稿の保存に失敗しました。";
+                    uploadStatus.style.color = 'red';
+                    submitButton.disabled = false;
                 }
-                closeModal();
             }
 
             window.deletePost = async (postId, type) => {
                 if (!isLoggedIn) return;
-                // confirm()は使用しないため、直接削除を実行します。
-                // 実運用ではカスタムの確認モーダルを実装することを推奨します。
+                // ここでは確認なしで削除します。本番環境では確認モーダルの実装を推奨します。
                 await deleteDoc(doc(db, type, postId));
                 if (!modal.classList.contains('hidden')) { closeModal(); }
             }
 
             // --- 初期化処理 ---
             function initialize() {
-                // イベントリスナー設定
                 loginForm.addEventListener('submit', handleLogin);
                 loginBtn.addEventListener('click', showLoginModal);
                 logoutBtn.addEventListener('click', handleLogout);
@@ -441,13 +488,11 @@
                 document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
                 mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
 
-                // ログイン状態を監視
                 onAuthStateChanged(auth, (user) => {
                     isLoggedIn = !!user;
                     updateAdminUI();
                 });
 
-                // Firestoreのリアルタイムリスナーを設定
                 const projectsQuery = query(projectsCollection, orderBy("createdAt", "desc"));
                 onSnapshot(projectsQuery, (snapshot) => {
                     localProjectsCache = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
@@ -466,5 +511,4 @@
     </script>
 </body>
 </html>
-
 
