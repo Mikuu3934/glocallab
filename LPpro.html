@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLOCALLAB - グローバルな世界へ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* カスタムカラースタイル */
+        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background-color: #FCF8DD; color: #333; }
+        .bg-custom-teal { background-color: #00809D; }
+        .text-custom-teal { color: #00809D; }
+        .bg-custom-ivory { background-color: #FCF8DD; }
+        .text-custom-ivory { color: #FCF8DD; }
+        .bg-custom-gold { background-color: #FFD700; }
+        .text-custom-gold { color: #FFD700; }
+        .bg-custom-dark-gold { background-color: #D3AF37; }
+        .text-custom-dark-gold { color: #D3AF37; }
+        .border-custom-gold { border-color: #FFD700; }
+
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://placehold.co/1600x900/00809D/FCF8DD?text=GLOBAL+LOCAL');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* モーダル & フォームスタイル */
+        .modal-open { overflow: hidden; }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .fade-out { animation: fadeOut 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+        .form-input { @apply w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-teal; }
+        .form-label { @apply block text-gray-700 text-sm font-bold mb-2; }
+        .admin-only, .logged-out-only { display: none; }
+    </style>
+</head>
+<body class="bg-custom-ivory">
+
+    <!-- ヘッダー -->
+    <header class="bg-custom-teal text-custom-ivory p-4 fixed w-full top-0 z-40 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-wider">GLOBAL LAB</h1>
+            <div class="flex items-center gap-4">
+                <nav class="hidden md:flex space-x-6 items-center">
+                    <a href="#about" class="hover:text-custom-gold transition duration-300">私たちについて</a>
+                    <a href="#projects" class="hover:text-custom-gold transition duration-300">プロジェクト</a>
+                    <a href="#news" class="hover:text-custom-gold transition duration-300">ニュース</a>
+                    <a href="#contact" class="hover:text-custom-gold transition duration-300">参加する</a>
+                </nav>
+                <!-- 管理者用メニュー -->
+                <div id="admin-menu" class="flex items-center gap-2">
+                    <button id="new-post-btn" class="admin-only bg-custom-gold hover:bg-custom-dark-gold text-custom-teal font-bold py-2 px-4 rounded-full transition-colors text-sm">新規投稿</button>
+                    <button id="logout-btn" class="admin-only bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full transition-colors text-sm">ログアウト</button>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-2xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                </button>
+            </div>
+        </div>
+        <!-- モバイルメニュー -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4">
+            <a href="#about" class="block py-2 px-4 hover:bg-custom-dark-gold rounded">私たちについて</a>
+            <a href="#projects" class="block py-2 px-4 hover:bg-custom-dark-gold rounded">プロジェクト</a>
+            <a href="#news" class="block py-2 px-4 hover:bg-custom-dark-gold rounded">ニュース</a>
+            <a href="#contact" class="block py-2 px-4 hover:bg-custom-dark-gold rounded">参加する</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- ヒーローセクション -->
+        <section class="hero-section h-screen flex items-center justify-center text-center text-white pt-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl md:text-6xl font-bold mb-4 leading-tight shadow-text">グローバルな社会へトビたとう。</h2>
+                <p class="text-lg md:text-xl max-w-2xl mx-auto">私たちは、グローバルな経験を、育成し、行動するクリエイティブな集団です。</p>
+            </div>
+        </section>
+
+        <!-- 私たちについて -->
+        <section id="about" class="py-20 bg-custom-ivory">
+            <div class="container mx-auto px-6 text-center">
+                <h3 class="text-3xl font-bold text-custom-teal mb-6">WHAT WE DO</h3>
+                <p class="max-w-3xl mx-auto text-gray-700 leading-relaxed">ここにテキストを入れる</p>
+            </div>
+        </section>
+
+        <!-- プロジェクトセクション -->
+        <section id="projects" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h3 class="text-3xl font-bold text-center text-custom-teal mb-12">OUR PROJECTS</h3>
+                <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Firestoreからプロジェクト記事がここに挿入されます -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ニュースセクション -->
+        <section id="news" class="py-20 bg-custom-ivory">
+            <div class="container mx-auto px-6">
+                <h3 class="text-3xl font-bold text-center text-custom-teal mb-12">LATEST NEWS</h3>
+                <div id="news-container" class="max-w-3xl mx-auto">
+                     <!-- Firestoreからニュース記事がここに挿入されます -->
+                </div>
+                <div class="text-center mt-12">
+                    <a href="#" class="bg-custom-teal text-white font-bold py-3 px-8 rounded-full hover:bg-opacity-80 transition duration-300">すべてのニュースを見る</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 参加するセクション -->
+        <section id="contact" class="py-20 bg-custom-dark-gold text-custom-ivory">
+             <div class="container mx-auto px-6 text-center">
+                <h3 class="text-3xl font-bold mb-6">JOIN US</h3>
+                <p class="max-w-2xl mx-auto mb-8">ここにテキストを入れる</p>
+                <a href="#" class="bg-custom-ivory text-custom-dark-gold font-bold py-3 px-8 rounded-full hover:bg-custom-gold hover:text-custom-teal transition duration-300">詳しくはこちら</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-custom-teal text-custom-ivory py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 GLOBALLAB. All Rights Reserved.</p>
+             <div class="mt-4">
+                <button id="login-btn" class="logged-out-only text-custom-ivory hover:text-custom-gold hover:underline text-sm transition-colors">管理者ログイン</button>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- 記事詳細・編集用モーダル -->
+    <div id="post-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
+        <div id="modal-content" class="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative fade-in">
+            <div id="modal-body" class="p-8"></div>
+        </div>
+    </div>
+
+    <!-- ログインモーダル -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-8 fade-in relative">
+            <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">管理者ログイン</h2>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label class="form-label" for="login-email">メールアドレス</label>
+                    <input class="form-input" id="login-email" type="email" placeholder="admin@example.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="login-password">パスワード</label>
+                    <input class="form-input" id="login-password" type="password" placeholder="********" required>
+                </div>
+                <p id="login-error" class="text-red-500 text-sm mb-4 h-5"></p>
+                <button type="submit" class="w-full bg-custom-teal hover:opacity-80 text-white font-bold py-2 px-4 rounded-lg transition-colors">ログイン</button>
+            </form>
+            <button id="close-login-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Firebaseライブラリをインポート
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // --- あなたのFirebaseプロジェクト設定 ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAiJ2woI6yEFDBYpdD-SQkPuBuJ8wPjI0o",
+            authDomain: "glocallabo-5a648.firebaseapp.com",
+            projectId: "glocallabo-5a648",
+            storageBucket: "glocallabo-5a648.appspot.com",
+            messagingSenderId: "284774520564",
+            appId: "1:284774520564:web:72d7f6d8fe6b24196bb0a1",
+            measurementId: "G-6EZCFTW65Q"
+        };
+
+        // Firebaseを初期化
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // --- ★ 2つのコレクションを定義 ---
+        const projectsCollection = collection(db, "projects");
+        const newsCollection = collection(db, "news");
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            let isLoggedIn = false;
+            let localProjectsCache = [];
+            let localNewsCache = [];
+
+            // --- Element selectors ---
+            const projectsContainer = document.getElementById('projects-container');
+            const newsContainer = document.getElementById('news-container');
+            const modal = document.getElementById('post-modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalBody = document.getElementById('modal-body');
+            const loginBtn = document.getElementById('login-btn');
+            const newPostBtn = document.getElementById('new-post-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const loginModal = document.getElementById('login-modal');
+            const loginForm = document.getElementById('login-form');
+            const emailInput = document.getElementById('login-email');
+            const passwordInput = document.getElementById('login-password');
+            const loginError = document.getElementById('login-error');
+            const closeLoginModalBtn = document.getElementById('close-login-modal-btn');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            // --- UI更新関連 ---
+            function updateAdminUI() {
+                const adminElements = document.querySelectorAll('.admin-only');
+                const loggedOutElements = document.querySelectorAll('.logged-out-only');
+                if (isLoggedIn) {
+                    adminElements.forEach(el => el.style.display = 'inline-block');
+                    loggedOutElements.forEach(el => el.style.display = 'none');
+                } else {
+                    adminElements.forEach(el => el.style.display = 'none');
+                    loggedOutElements.forEach(el => el.style.display = 'inline-block');
+                }
+                // 再描画して管理ボタンの表示/非表示を更新
+                displayProjects(localProjectsCache);
+                displayNews(localNewsCache);
+            }
+
+            function showLoginModal() {
+                loginError.textContent = '';
+                emailInput.value = '';
+                passwordInput.value = '';
+                loginModal.classList.remove('hidden');
+                loginModal.classList.add('flex');
+            }
+
+            function hideLoginModal() {
+                loginModal.classList.add('hidden');
+                loginModal.classList.remove('flex');
+            }
+
+            // --- ログイン・ログアウト処理 ---
+            async function handleLogin(event) {
+                event.preventDefault();
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                loginError.textContent = '';
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    hideLoginModal();
+                } catch (error) {
+                    console.error("Login failed:", error);
+                    loginError.textContent = 'メールアドレスまたはパスワードが違います。';
+                }
+            }
+
+            async function handleLogout() {
+                try {
+                    await signOut(auth);
+                } catch (error) {
+                    console.error("Logout failed:", error);
+                }
+            }
+            
+            // --- 記事一覧表示 ---
+            function displayProjects(posts) {
+                projectsContainer.innerHTML = '';
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'bg-custom-ivory rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 flex flex-col';
+                    
+                    const adminButtons = isLoggedIn ? `
+                        <div class="bg-gray-100 p-2 flex justify-end gap-2">
+                            <button onclick="openModal('${post.id}', 'projects', 'edit')" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded-lg">編集</button>
+                            <button onclick="deletePost('${post.id}', 'projects')" class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-1 px-2 rounded-lg">削除</button>
+                        </div>
+                    ` : '';
+                    
+                    postElement.innerHTML = `
+                        <img src="${post.imageUrl || 'https://placehold.co/600x400/00809D/FCF8DD?text=Project'}" alt="${post.title}" class="w-full h-48 object-cover">
+                        <div class="p-6 flex-grow flex flex-col cursor-pointer" onclick="openModal('${post.id}', 'projects', 'read')">
+                            <p class="text-sm text-custom-teal font-bold">プロジェクト</p>
+                            <h4 class="text-xl font-bold text-custom-teal my-2">${post.title}</h4>
+                            <p class="text-gray-500 text-sm mb-4">${post.date}</p>
+                            <p class="text-gray-600 mb-4 flex-grow">${post.snippet}</p>
+                            <a href="#" class="mt-auto text-custom-dark-gold font-bold hover:underline">もっと見る →</a>
+                        </div>
+                        ${adminButtons}
+                    `;
+                    projectsContainer.appendChild(postElement);
+                });
+            }
+
+            function displayNews(posts) {
+                newsContainer.innerHTML = '';
+                 posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    // デザインをリスト形式に変更し、flexboxで要素を配置
+                    postElement.className = 'border-b-2 border-custom-dark-gold py-4 flex justify-between items-center';
+
+                    // ログインしている管理者向けのボタン
+                    const adminButtons = isLoggedIn ? `
+                        <div class="flex-shrink-0 ml-4 flex gap-2">
+                            <button onclick="openModal('${post.id}', 'news', 'edit')" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded-lg">編集</button>
+                            <button onclick="deletePost('${post.id}', 'news')" class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-1 px-2 rounded-lg">削除</button>
+                        </div>
+                    ` : '';
+
+                    postElement.innerHTML = `
+                        <div>
+                            <p class="text-gray-500">${post.date}</p>
+                            <a href="javascript:void(0)" onclick="event.preventDefault(); window.openModal('${post.id}', 'news', 'read')" class="text-lg text-custom-teal hover:text-custom-dark-gold transition">${post.title}</a>
+                        </div>
+                        ${adminButtons}
+                    `;
+                    newsContainer.appendChild(postElement);
+                });
+            }
+
+
+            // --- モーダル関連 ---
+            window.openModal = (postId, type, mode = 'read') => {
+                if (mode !== 'read' && !isLoggedIn) return;
+                
+                const cache = type === 'projects' ? localProjectsCache : localNewsCache;
+                const post = cache.find(p => p.id === postId);
+                if (!post && mode !== 'new') return;
+
+                if (mode === 'read') {
+                    renderReadView(post, type);
+                } else {
+                    renderEditView(post, type);
+                }
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('modal-open');
+                modalContent.classList.remove('fade-out');
+                modalContent.classList.add('fade-in');
+            }
+            
+            function renderReadView(post, type) {
+                const adminButtons = isLoggedIn ? `
+                    <div class="flex justify-end gap-2 mt-8">
+                        <button onclick="openModal('${post.id}', '${type}', 'edit')" class="bg-custom-teal hover:opacity-80 text-white font-bold py-2 px-4 rounded-lg">編集</button>
+                        <button onclick="deletePost('${post.id}', '${type}')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">削除</button>
+                    </div>` : '';
+                modalBody.innerHTML = `
+                    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    <img src="${post.imageUrl || 'https://placehold.co/600x300'}" alt="${post.title}" class="w-full h-64 object-cover rounded-lg mb-4">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${post.title}</h2>
+                    <p class="text-base text-gray-500 mb-6">${post.date}</p>
+                    <div class="prose max-w-none text-gray-800 text-lg leading-relaxed">${post.content.replace(/\n/g, '<br>')}</div>
+                    ${adminButtons}
+                `;
+            }
+
+            function renderEditView(post = null, type = 'projects') {
+                if (!isLoggedIn) return;
+                const isNew = post === null;
+                const postId = isNew ? '' : post.id;
+                modalBody.innerHTML = `
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">${isNew ? '新規投稿の作成' : '投稿の編集'}</h2>
+                    <form id="post-form" data-post-id="${postId}">
+                        <div class="mb-4">
+                            <label class="form-label" for="category">カテゴリー</label>
+                            <select id="category" class="form-input" required>
+                                <option value="projects" ${type === 'projects' ? 'selected' : ''}>プロジェクト</option>
+                                <option value="news" ${type === 'news' ? 'selected' : ''}>ニュース</option>
+                            </select>
+                        </div>
+                        <div class="mb-4"><label class="form-label" for="title">タイトル</label><input class="form-input" id="title" type="text" value="${isNew ? '' : post.title}" required></div>
+                        <div class="mb-4"><label class="form-label" for="date">日付</label><input class="form-input" id="date" type="text" value="${isNew ? new Date().toLocaleDateString('ja-JP').replaceAll('/', '-') : post.date}" required></div>
+                        <div class="mb-4"><label class="form-label" for="imageUrl">画像URL</label><input class="form-input" id="imageUrl" type="text" value="${isNew ? '' : post.imageUrl || ''}" placeholder="https://example.com/image.jpg"></div>
+                        <div class="mb-4"><label class="form-label" for="snippet">概要（一覧に表示）</label><textarea class="form-input" id="snippet" rows="3" required>${isNew ? '' : post.snippet}</textarea></div>
+                        <div class="mb-6"><label class="form-label" for="content">本文</label><textarea class="form-input" id="content" rows="10" required>${isNew ? '' : post.content}</textarea></div>
+                        <div class="flex justify-end gap-4">
+                            <button type="button" onclick="closeModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">キャンセル</button>
+                            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">保存</button>
+                        </div>
+                    </form>
+                `;
+                document.getElementById('post-form').addEventListener('submit', savePost);
+            }
+
+            window.closeModal = () => {
+                modalContent.classList.remove('fade-in');
+                modalContent.classList.add('fade-out');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.classList.remove('modal-open');
+                    modalBody.innerHTML = '';
+                }, 300);
+            }
+
+            // --- Firestoreデータ操作 ---
+            async function savePost(event) {
+                event.preventDefault();
+                if (!isLoggedIn) return;
+                const form = event.target;
+                const postId = form.dataset.postId;
+                const category = form.querySelector('#category').value;
+                const collectionRef = category === 'projects' ? projectsCollection : newsCollection;
+
+                const postData = {
+                    title: form.querySelector('#title').value,
+                    date: form.querySelector('#date').value,
+                    snippet: form.querySelector('#snippet').value,
+                    content: form.querySelector('#content').value,
+                    imageUrl: form.querySelector('#imageUrl').value,
+                    updatedAt: serverTimestamp()
+                };
+                
+                if (postId) {
+                    await setDoc(doc(db, category, postId), postData, { merge: true });
+                } else {
+                    postData.createdAt = serverTimestamp();
+                    await addDoc(collectionRef, postData);
+                }
+                closeModal();
+            }
+
+            window.deletePost = async (postId, type) => {
+                if (!isLoggedIn) return;
+                // confirm()は使用しないため、直接削除を実行します。
+                // 実運用ではカスタムの確認モーダルを実装することを推奨します。
+                await deleteDoc(doc(db, type, postId));
+                if (!modal.classList.contains('hidden')) { closeModal(); }
+            }
+
+            // --- 初期化処理 ---
+            function initialize() {
+                // イベントリスナー設定
+                loginForm.addEventListener('submit', handleLogin);
+                loginBtn.addEventListener('click', showLoginModal);
+                logoutBtn.addEventListener('click', handleLogout);
+                closeLoginModalBtn.addEventListener('click', hideLoginModal);
+                newPostBtn.addEventListener('click', () => openModal(null, 'projects', 'new'));
+                modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+                document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
+                mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+                // ログイン状態を監視
+                onAuthStateChanged(auth, (user) => {
+                    isLoggedIn = !!user;
+                    updateAdminUI();
+                });
+
+                // Firestoreのリアルタイムリスナーを設定
+                const projectsQuery = query(projectsCollection, orderBy("createdAt", "desc"));
+                onSnapshot(projectsQuery, (snapshot) => {
+                    localProjectsCache = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+                    displayProjects(localProjectsCache);
+                });
+
+                const newsQuery = query(newsCollection, orderBy("createdAt", "desc"));
+                onSnapshot(newsQuery, (snapshot) => {
+                    localNewsCache = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+                    displayNews(localNewsCache);
+                });
+            }
+
+            initialize();
+        });
+    </script>
+</body>
+</html>
+
+
